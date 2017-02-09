@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    /// <summary>
+    /// ////////////////////Need dead boolean that equals true based off of equation and input.
+    /// </summary>
 
-    Vector3 playerLoc = Camera.main.transform.position;
+    Vector3 playerLoc;
 
     // Use this for initialization
     void Start()
     {
+        playerLoc = Camera.main.transform.position;
     }
 
     // Update is called once per frame
