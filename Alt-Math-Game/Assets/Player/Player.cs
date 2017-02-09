@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerView : MonoBehaviour {
+public class Player : MonoBehaviour {
     public int lookSpeed = 5;
     public GameObject enemy;
+    public List<Enemy> enemyList;
 	// Use this for initialization
-	void Start () {
-		
+	void Start ()
+    {
 	}
 	
 	// Update is called once per frame
