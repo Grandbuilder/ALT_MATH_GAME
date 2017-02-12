@@ -34,23 +34,23 @@ public class Enemy : MonoBehaviour
         //move towards player
         if (newVec[0] > playerLoc.x)
         {
-            newVec[0]-= moveSpeed;
+            newVec[0] -= moveSpeed;
         }
         else if (newVec[0] < playerLoc.x)
         {
-            newVec[0]+= moveSpeed;
+            newVec[0] += moveSpeed;
         }
         if (newVec[2] > playerLoc.z)
         {
-            newVec[2]-= moveSpeed;
+            newVec[2] -= moveSpeed;
         }
         else if (newVec[2] < playerLoc.z)
         {
-            newVec[2]+= moveSpeed;
+            newVec[2] += moveSpeed;
         }
         this.transform.position = newVec;
 
-        if((transform.position.x + moveSpeed > playerLoc.x && transform.position.x - moveSpeed < playerLoc.x)
+        if ((transform.position.x + moveSpeed > playerLoc.x && transform.position.x - moveSpeed < playerLoc.x)
             && (transform.position.z + moveSpeed > playerLoc.z && transform.position.z - moveSpeed < playerLoc.z))
         {
             reachedPlayer = true;

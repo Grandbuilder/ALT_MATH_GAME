@@ -1,29 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     //Still need:
     //Display current equation
-    //Player moves to each next enemy
-    //Polished victory and loss. Currently exits a built game immediately.
+    //display hp -after prototype
+    //Player moves to each next enemy -after prototype
+    //Polished victory and loss. Currently exits a built game immediately. -after prototype
 
     public int lookSpeed = 5;   //rotation speed of player
+    public int health = 3;          //player health. 1 damage taken per failed encounter
+    public GameObject equationText;
     private GameObject currentEnemy;    //currently active enemy
     private int numEnemies;     //number of enemies on this level
     private GameObject[] enemies;   //enemies array
     private int activeEnemyIndex;   //current index of enemy array (progress in level)
-    public int health = 3;          //player health. 1 damage taken per failed encounter
     private EquationGen[] equations;    //array of equations to be generated for level
-    public string stringToEdit;
+    private string stringToEdit;
     private float camHeight;
     private float camWidth;
     private Rect inputBox;
     private bool wrongAnswer;
+    private bool enterStillDown;        //for preventing duplicate input processing from one key press
     // Use this for initialization
     void Start()
     {
+        stringToEdit = "";
         camHeight = Camera.main.pixelHeight;
         camWidth = Camera.main.pixelWidth;
         inputBox = new Rect(camWidth * .4f, camHeight * .9f, 200, 20);
@@ -39,7 +44,7 @@ public class Player : MonoBehaviour
             enemies[i].SetActive(false);
         }
         enemies[0].SetActive(true);
-        Debug.Log(numEnemies);
+        equationText.transform.GetComponent<Text>().text = "Equation:     " + equations[activeEnemyIndex].equation;
         currentEnemy = enemies[0];
     }
 
@@ -87,6 +92,7 @@ public class Player : MonoBehaviour
                 //victory
                 endGame();
             }
+            equationText.transform.GetComponent<Text>().text = "Equation: " + equations[activeEnemyIndex].equation;
         }
     }
     /// <summary>
@@ -98,39 +104,41 @@ public class Player : MonoBehaviour
     Quaternion.LookRotation(currentEnemy.transform.position - transform.position),
     lookSpeed * Time.deltaTime);
     }
-    /// <summary>
-    /// Check if player input was submitted, and if it matches equation solution.
-    /// Enemy dies and player loses health if failed. Check for death.
-    /// Enemy dies if correct.
-    /// Record correct or incorrect answer.
-    /// </summary>
-    void checkInput()
-    {
-        Debug.Log(numEnemies);
-        currentEnemy.SetActive(false);
-        //equation generator input comparison
-        if (stringToEdit == equations[activeEnemyIndex].solution)
-        {
-            //good job! move to next enemy
-        }
-        else
-        {
-            wrongAnswer = true;
-        }
-    }
+
     void endGame()
     {
         Application.Quit();
     }
+    /// <summary>
+    /// Runs every frame, built in function.
+    /// We use it to keep an input text box and to check input.
+    /// </summary>
     void OnGUI()
     {
-        GUI.SetNextControlName("MyTextField");
+        GUI.SetNextControlName("mytextfield");
         stringToEdit = GUI.TextField(inputBox, stringToEdit, 25);
-        GUI.FocusControl("MyTextField");
-        Event e = Event.current;
-        if (e.keyCode == KeyCode.Return)
+        GUI.FocusControl("mytextfield");
+
+        /// <summary>
+        /// Check if player input was submitted, and if it matches equation solution.
+        /// Enemy dies and player loses health if failed. Check for death.
+        /// Enemy dies if correct.
+        /// AFTER PROTOTYPE: Record correct or incorrect answer.
+        /// </summary>
+        if (Event.current.isKey && Event.current.keyCode == KeyCode.Return && !enterStillDown)
         {
-            checkInput();
+            enterStillDown = true;
+            currentEnemy.SetActive(false);
+            //equation generator input comparison
+            if (stringToEdit != equations[activeEnemyIndex].solution)
+            {
+                wrongAnswer = true;
+            }
+            stringToEdit = "";
+        }
+        if (Event.current.keyCode != KeyCode.Return)
+        {
+            enterStillDown = false;
         }
     }
 }
