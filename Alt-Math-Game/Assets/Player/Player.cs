@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class Player : MonoBehaviour
 {
     //Still need:
@@ -73,8 +72,7 @@ public class Player : MonoBehaviour
                 health--;
                 if (health <= 0)
                 {
-                    //gameover! retry level?
-                    endGame();
+                    GameManager.gameOverScene();
                 }
             }
             //increment enemies index
