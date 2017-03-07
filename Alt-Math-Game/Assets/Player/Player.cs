@@ -24,9 +24,35 @@ public class Player : MonoBehaviour
     private Rect inputBox;
     private bool wrongAnswer;
     private bool enterStillDown;        //for preventing duplicate input processing from one key press
+
+    //main music for the game
+    private AudioSource mainMusic;
+    AudioClip apac;
+    //sound for writing
+    private AudioSource write;
+    AudioClip wrt;
+    //sound for attack
+    private AudioSource monster;
+    AudioClip mstr;
+
     // Use this for initialization
     void Start()
     {
+        //initializing the game music
+        mainMusic = gameObject.AddComponent<AudioSource>();
+        apac = (AudioClip)Resources.Load("Audio/apacolypse");
+        mainMusic.clip = apac;
+        mainMusic.loop = true;
+        mainMusic.Play();
+
+        write = gameObject.AddComponent<AudioSource>();
+        wrt = (AudioClip)Resources.Load("Audio/write");
+        write.clip = wrt;
+
+        monster = gameObject.AddComponent<AudioSource>();
+        mstr = (AudioClip)Resources.Load("Audio/monster");
+        monster.clip = mstr;
+
         stringToEdit = "";
         camHeight = Camera.main.pixelHeight;
         camWidth = Camera.main.pixelWidth;
@@ -45,6 +71,7 @@ public class Player : MonoBehaviour
         enemies[0].SetActive(true);
         equationText.transform.GetComponent<Text>().text = "Equation:     " + equations[activeEnemyIndex].equation;
         currentEnemy = enemies[0];
+        
     }
 
     // Update is called once per frame
@@ -68,6 +95,7 @@ public class Player : MonoBehaviour
             //if enemy reached player or player gave wrong answer, lose 1 hp and check if dead.
             if (curEnemy.reachedPlayer || wrongAnswer)
             {
+                monster.PlayOneShot(mstr);
                 wrongAnswer = false;
                 health--;
                 if (health <= 0)
@@ -131,6 +159,10 @@ public class Player : MonoBehaviour
             if (stringToEdit != equations[activeEnemyIndex].solution)
             {
                 wrongAnswer = true;
+            }
+            else
+            {
+                write.PlayOneShot(wrt);
             }
             stringToEdit = "";
         }
