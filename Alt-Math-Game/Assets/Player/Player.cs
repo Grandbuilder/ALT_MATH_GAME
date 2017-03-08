@@ -15,7 +15,9 @@ public class Player : MonoBehaviour
     public GameObject equationText;
     private GameObject currentEnemy;    //currently active enemy
     private int numEnemies;     //number of enemies on this level
+    private int numLevels;     //number of levels in world
     private GameObject[] enemies;   //enemies array
+    private GameObject[] levels;   //levels array. Each level holds child enemies
     private int activeEnemyIndex;   //current index of enemy array (progress in level)
     private EquationGen[] equations;    //array of equations to be generated for level
     private string stringToEdit;
@@ -56,22 +58,45 @@ public class Player : MonoBehaviour
         stringToEdit = "";
         camHeight = Camera.main.pixelHeight;
         camWidth = Camera.main.pixelWidth;
-        inputBox = new Rect(camWidth * .4f, camHeight * .9f, 200, 20);
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        numEnemies = enemies.Length;
+        inputBox = new Rect(camWidth * .4f, camHeight-150, 200, 20);
+        levels = GameObject.FindGameObjectsWithTag("Level");
+        numLevels = levels.Length;
         activeEnemyIndex = 0;
-        equations = new EquationGen[numEnemies];
         //set all enemies to inactive on first update except first enemy
-        //equation generated for each enemy
-        for (int i = 0; i < numEnemies; i++)
+        //equation generated for each enemy 
+        for (int i = 0; i < numLevels; i++)
         {
-            equations[i] = new EquationGen();
-            enemies[i].SetActive(false);
+            numEnemies += levels[i].transform.childCount;//each level prefab has 20 children
         }
+        enemies = new GameObject[numEnemies];
+        equations = new EquationGen[numEnemies];
+        for (int i = 0; i < numLevels; i++)
+        {
+            /////THIS WILL NEED TO BE UPDATED TO HANDLE NEW LEVELS
+            int s = 0;
+            if(levels[i].name.Contains("0"))
+            {
+                s = 0;//if name contains 0 it is level 0, this is needed for player movement
+            }
+            else
+            {
+                s = 1;
+            }
+            for(int k = 0; k < 20; k++)
+            {
+                enemies[s*20+k] = levels[i].transform.GetChild(k).gameObject;
+                equations[s * 20 + k] = new EquationGen(i+1);//generates equation based off current level
+                enemies[s * 20 + k].SetActive(false);
+                Debug.Log("enemy initialized: " + (s * 20 + k));
+            }
+            
+        }
+            
+
         enemies[0].SetActive(true);
         equationText.transform.GetComponent<Text>().text = "Equation:     " + equations[activeEnemyIndex].equation;
         currentEnemy = enemies[0];
-        
+
     }
 
     // Update is called once per frame
@@ -108,6 +133,11 @@ public class Player : MonoBehaviour
             //if we haven't beat all enemies
             if (activeEnemyIndex < numEnemies)
             {
+                if(activeEnemyIndex == 20)
+                {
+                    //move player to level 2
+                    transform.position = levels[1].transform.position;
+                }
                 //current enemy is next enemy in array of enemies, activate it
                 enemies[activeEnemyIndex].SetActive(true);
                 currentEnemy = enemies[activeEnemyIndex];
@@ -133,7 +163,7 @@ public class Player : MonoBehaviour
 
     void endGame()
     {
-        Application.Quit();
+        GameManager.nextScene();
     }
     /// <summary>
     /// Runs every frame, built in function.
