@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
     /// <summary>
     /// ////////////////////Need dead boolean that equals true based off of equation and input.
     /// </summary>
-    public float moveSpeed = 0.005f;
+    public float moveSpeed = 0.01f;
     private Vector3 playerLoc;
     [HideInInspector]
     public bool reachedPlayer;
@@ -21,10 +21,11 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        playerLoc = Camera.main.transform.position;
         //looking at player
         transform.rotation = Quaternion.Slerp(transform.rotation,
     Quaternion.LookRotation(playerLoc - transform.position),
-    .1f * Time.deltaTime);
+    .2f * Time.deltaTime);
 
         //moving to player
         Vector3 newVec = this.transform.position;

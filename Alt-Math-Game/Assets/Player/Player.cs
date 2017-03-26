@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 public class Player : MonoBehaviour
@@ -15,7 +16,9 @@ public class Player : MonoBehaviour
     public GameObject equationText;
     private GameObject currentEnemy;    //currently active enemy
     private int numEnemies;     //number of enemies on this level
+    private int numLevels;     //number of levels in world
     private GameObject[] enemies;   //enemies array
+    private GameObject[] levels;   //levels array. Each level holds child enemies
     private int activeEnemyIndex;   //current index of enemy array (progress in level)
     private EquationGen[] equations;    //array of equations to be generated for level
     private string stringToEdit;
@@ -24,7 +27,6 @@ public class Player : MonoBehaviour
     private Rect inputBox;
     private bool wrongAnswer;
     private bool enterStillDown;        //for preventing duplicate input processing from one key press
-
     //main music for the game
     private AudioSource mainMusic;
     AudioClip apac;
@@ -56,22 +58,35 @@ public class Player : MonoBehaviour
         stringToEdit = "";
         camHeight = Camera.main.pixelHeight;
         camWidth = Camera.main.pixelWidth;
-        inputBox = new Rect(camWidth * .4f, camHeight * .9f, 200, 20);
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        numEnemies = enemies.Length;
+        inputBox = new Rect(camWidth * .4f, camHeight-150, 200, 20);
+        levels = GameObject.FindGameObjectsWithTag("Level").OrderBy(go => go.name).ToArray(); ;
+        numLevels = levels.Length;
         activeEnemyIndex = 0;
-        equations = new EquationGen[numEnemies];
         //set all enemies to inactive on first update except first enemy
-        //equation generated for each enemy
-        for (int i = 0; i < numEnemies; i++)
+        //equation generated for each enemy 
+        for (int i = 0; i < numLevels; i++)
         {
-            equations[i] = new EquationGen();
-            enemies[i].SetActive(false);
+            numEnemies += levels[i].transform.childCount;//each level prefab has 20 children
         }
+        enemies = new GameObject[numEnemies];
+        equations = new EquationGen[numEnemies];
+        for (int i = 0; i < numLevels; i++)
+        {
+            for(int k = 0; k < 20; k++)
+            {
+                enemies[i*20+k] = levels[i].transform.GetChild(k).gameObject;
+                equations[i * 20 + k] = new EquationGen(i+1);//generates equation based off current level
+                enemies[i * 20 + k].SetActive(false);
+                Debug.Log("enemy initialized: " + (i * 20 + k));
+            }
+            
+        }
+            
+
         enemies[0].SetActive(true);
         equationText.transform.GetComponent<Text>().text = "Equation:     " + equations[activeEnemyIndex].equation;
         currentEnemy = enemies[0];
-        
+
     }
 
     // Update is called once per frame
@@ -105,9 +120,18 @@ public class Player : MonoBehaviour
             }
             //increment enemies index
             activeEnemyIndex++;
+            
             //if we haven't beat all enemies
             if (activeEnemyIndex < numEnemies)
             {
+                Debug.Log("Active Enemy Index:" +activeEnemyIndex);
+                if(activeEnemyIndex == 20)
+                {
+                    Debug.Log("");
+                    Debug.Log("Suppose to move to level 2.");
+                    //move player to level 2
+                    transform.position = levels[1].transform.position;
+                }
                 //current enemy is next enemy in array of enemies, activate it
                 enemies[activeEnemyIndex].SetActive(true);
                 currentEnemy = enemies[activeEnemyIndex];
@@ -133,7 +157,7 @@ public class Player : MonoBehaviour
 
     void endGame()
     {
-        Application.Quit();
+        GameManager.nextScene();
     }
     /// <summary>
     /// Runs every frame, built in function.
@@ -151,7 +175,7 @@ public class Player : MonoBehaviour
         /// Enemy dies if correct.
         /// AFTER PROTOTYPE: Record correct or incorrect answer.
         /// </summary>
-        if (Event.current.isKey && Event.current.keyCode == KeyCode.Return && !enterStillDown)
+        if (Event.current.isKey && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter) && !enterStillDown)
         {
             enterStillDown = true;
             currentEnemy.SetActive(false);
@@ -166,7 +190,7 @@ public class Player : MonoBehaviour
             }
             stringToEdit = "";
         }
-        if (Event.current.keyCode != KeyCode.Return)
+        if (Event.current.keyCode != KeyCode.Return && Event.current.keyCode != KeyCode.KeypadEnter)
         {
             enterStillDown = false;
         }
