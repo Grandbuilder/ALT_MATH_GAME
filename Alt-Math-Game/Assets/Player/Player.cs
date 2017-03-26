@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 public class Player : MonoBehaviour
@@ -26,7 +27,6 @@ public class Player : MonoBehaviour
     private Rect inputBox;
     private bool wrongAnswer;
     private bool enterStillDown;        //for preventing duplicate input processing from one key press
-
     //main music for the game
     private AudioSource mainMusic;
     AudioClip apac;
@@ -59,7 +59,7 @@ public class Player : MonoBehaviour
         camHeight = Camera.main.pixelHeight;
         camWidth = Camera.main.pixelWidth;
         inputBox = new Rect(camWidth * .4f, camHeight-150, 200, 20);
-        levels = GameObject.FindGameObjectsWithTag("Level");
+        levels = GameObject.FindGameObjectsWithTag("Level").OrderBy(go => go.name).ToArray(); ;
         numLevels = levels.Length;
         activeEnemyIndex = 0;
         //set all enemies to inactive on first update except first enemy
@@ -72,22 +72,12 @@ public class Player : MonoBehaviour
         equations = new EquationGen[numEnemies];
         for (int i = 0; i < numLevels; i++)
         {
-            /////THIS WILL NEED TO BE UPDATED TO HANDLE NEW LEVELS
-            int s = 0;
-            if(levels[i].name.Contains("0"))
-            {
-                s = 0;//if name contains 0 it is level 0, this is needed for player movement
-            }
-            else
-            {
-                s = 1;
-            }
             for(int k = 0; k < 20; k++)
             {
-                enemies[s*20+k] = levels[i].transform.GetChild(k).gameObject;
-                equations[s * 20 + k] = new EquationGen(i+1);//generates equation based off current level
-                enemies[s * 20 + k].SetActive(false);
-                Debug.Log("enemy initialized: " + (s * 20 + k));
+                enemies[i*20+k] = levels[i].transform.GetChild(k).gameObject;
+                equations[i * 20 + k] = new EquationGen(i+1);//generates equation based off current level
+                enemies[i * 20 + k].SetActive(false);
+                Debug.Log("enemy initialized: " + (i * 20 + k));
             }
             
         }
@@ -130,11 +120,15 @@ public class Player : MonoBehaviour
             }
             //increment enemies index
             activeEnemyIndex++;
+            
             //if we haven't beat all enemies
             if (activeEnemyIndex < numEnemies)
             {
+                Debug.Log("Active Enemy Index:" +activeEnemyIndex);
                 if(activeEnemyIndex == 20)
                 {
+                    Debug.Log("");
+                    Debug.Log("Suppose to move to level 2.");
                     //move player to level 2
                     transform.position = levels[1].transform.position;
                 }
@@ -181,7 +175,7 @@ public class Player : MonoBehaviour
         /// Enemy dies if correct.
         /// AFTER PROTOTYPE: Record correct or incorrect answer.
         /// </summary>
-        if (Event.current.isKey && Event.current.keyCode == KeyCode.Return && !enterStillDown)
+        if (Event.current.isKey && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter) && !enterStillDown)
         {
             enterStillDown = true;
             currentEnemy.SetActive(false);
@@ -196,7 +190,7 @@ public class Player : MonoBehaviour
             }
             stringToEdit = "";
         }
-        if (Event.current.keyCode != KeyCode.Return)
+        if (Event.current.keyCode != KeyCode.Return && Event.current.keyCode != KeyCode.KeypadEnter)
         {
             enterStillDown = false;
         }
