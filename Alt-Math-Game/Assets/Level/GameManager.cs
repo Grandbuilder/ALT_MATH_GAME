@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-    static int numScenes = 3;
+    static int numScenes = 4;
 	// Use this for initialization
 	void Start () {
 	}
@@ -28,6 +28,10 @@ public class GameManager : MonoBehaviour {
         {
             SceneManager.LoadScene(0);
         }
+        else if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            SceneManager.LoadScene(0);
+        }
         else
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
@@ -36,5 +40,13 @@ public class GameManager : MonoBehaviour {
     public static void gameOverScene()
     {
         SceneManager.LoadScene(numScenes-1);
+    }
+    public void quitGame()
+    {
+        Application.Quit();
+    }
+    public void startGame()
+    {
+        SceneManager.LoadScene(2);
     }
 }
