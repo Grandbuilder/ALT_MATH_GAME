@@ -21,6 +21,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        playerLoc = Camera.main.transform.position;
         //looking at player
         transform.rotation = Quaternion.Slerp(transform.rotation,
     Quaternion.LookRotation(playerLoc - transform.position),
