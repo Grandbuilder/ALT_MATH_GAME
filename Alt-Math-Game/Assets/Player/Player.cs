@@ -25,6 +25,12 @@ public class Player : MonoBehaviour
     private float camHeight;
     private float camWidth;
     private Rect inputBox;
+
+    private Rect scoreBox;
+    private int score = 0;
+
+    private Rect healthBox;
+
     private bool wrongAnswer;
     private bool enterStillDown;        //for preventing duplicate input processing from one key press
     //main music for the game
@@ -58,7 +64,12 @@ public class Player : MonoBehaviour
         stringToEdit = "";
         camHeight = Camera.main.pixelHeight;
         camWidth = Camera.main.pixelWidth;
-        inputBox = new Rect(camWidth * .4f, camHeight-150, 200, 20);
+        inputBox = new Rect(camWidth * .4f, camHeight - 150, 200, 20);
+
+        healthBox = new Rect(0, camHeight - 50, 100, 100);
+
+        scoreBox = new Rect(0, camHeight - 25, 100, 100);
+
         levels = GameObject.FindGameObjectsWithTag("Level").OrderBy(go => go.name).ToArray(); ;
         numLevels = levels.Length;
         activeEnemyIndex = 0;
@@ -72,19 +83,20 @@ public class Player : MonoBehaviour
         equations = new EquationGen[numEnemies];
         for (int i = 0; i < numLevels; i++)
         {
-            for(int k = 0; k < 20; k++)
+            for (int k = 0; k < 20; k++)
             {
-                enemies[i*20+k] = levels[i].transform.GetChild(k).gameObject;
-                equations[i * 20 + k] = new EquationGen(i+1);//generates equation based off current level
+                enemies[i * 20 + k] = levels[i].transform.GetChild(k).gameObject;
+                equations[i * 20 + k] = new EquationGen(i + 1);//generates equation based off current level
                 enemies[i * 20 + k].SetActive(false);
                 Debug.Log("enemy initialized: " + (i * 20 + k));
             }
-            
+
         }
-            
+
 
         enemies[0].SetActive(true);
-        equationText.transform.GetComponent<Text>().text = "Equation:     " + equations[activeEnemyIndex].equation;
+        //this the equation shown
+        equationText.transform.GetComponent<Text>().text = "Equation: " + equations[activeEnemyIndex].equation;
         currentEnemy = enemies[0];
 
     }
@@ -120,12 +132,12 @@ public class Player : MonoBehaviour
             }
             //increment enemies index
             activeEnemyIndex++;
-            
+
             //if we haven't beat all enemies
             if (activeEnemyIndex < numEnemies)
             {
-                Debug.Log("Active Enemy Index:" +activeEnemyIndex);
-                if(activeEnemyIndex == 20)
+                Debug.Log("Active Enemy Index:" + activeEnemyIndex);
+                if (activeEnemyIndex == 20)
                 {
                     Debug.Log("");
                     Debug.Log("Suppose to move to level 2.");
@@ -165,6 +177,14 @@ public class Player : MonoBehaviour
     /// </summary>
     void OnGUI()
     {
+
+        var style = new GUIStyle();
+        style.fontSize = 20;
+
+        GUI.Label(scoreBox, "Score: " + score.ToString(), style);
+        GUI.Label(healthBox, "Health: " + health.ToString(), style);
+
+
         GUI.SetNextControlName("mytextfield");
         stringToEdit = GUI.TextField(inputBox, stringToEdit, 25);
         GUI.FocusControl("mytextfield");
@@ -187,6 +207,7 @@ public class Player : MonoBehaviour
             else
             {
                 write.PlayOneShot(wrt);
+                score += 1000;
             }
             stringToEdit = "";
         }

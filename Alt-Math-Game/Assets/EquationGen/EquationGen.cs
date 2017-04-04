@@ -47,7 +47,7 @@ public class EquationGen
         //Number types: Whole numbers, Negative Numbers, Fractions, Mixed Numbers, Decimals
         //Operations: Addition, Subtraction, Multiplication, Division
         //Hmm... Maybe we should arrange levels by topic.
-        if(genSeed == 0)
+        if (genSeed == 0)
         {
             genSeed = UnityEngine.Random.Range(1, 9);
         }
@@ -55,7 +55,7 @@ public class EquationGen
         {
             BasicAddSub();
         }
-        else if (genSeed == 2)
+        else if (genSeed == 8)
         {
             HundredsAddSub();
         }
@@ -71,14 +71,22 @@ public class EquationGen
         {
             HundredsMultiDiv();
         }
-        
-        else if(genSeed == 6)
+
+        else if (genSeed == 6)
         {
             FractionsAddSub();
         }
-        else if(genSeed == 7)
+        else if (genSeed == 7)
         {
             FractionsMultiDiv();
+        }
+        else if (genSeed == 8)
+        {
+            integration();
+        }
+        else if (genSeed == 9)
+        {
+            derivative();
         }
         //else if(genSeed == 8)
         //{
@@ -129,7 +137,77 @@ public class EquationGen
 
     }
 
-    
+    /// <summary>
+    /// the derivative function is very similar to the integral function but their is no check for fraction creation because we multiply rather than divide.
+    /// </summary>
+    private void derivative()
+    {
+        int a = UnityEngine.Random.Range(2, 5);
+        int b;
+        string derivative = "Derivative of" + " ";
+        string answer = "";
+        while (a > 1)
+        {
+            b = UnityEngine.Random.Range(1, a);
+            if (a <= 3)
+            {
+                derivative += (b * a).ToString() + "X^" + (a).ToString();
+                if (a - 1 == 1)
+                {
+                    answer += (b * a * a).ToString() + "X";
+                }
+                else
+                {
+                    answer += (b * a * a).ToString() + "X^" + (a - 1).ToString();
+                }
+                break;
+            }
+            else
+            {
+                derivative += (b * a).ToString() + "X^" + (a).ToString() + " " + "+" + " ";
+                answer += (b * a * a).ToString() + "X^" + (a - 1).ToString() + " " + "+" + " ";
+            }
+            a = a / 2;
+        }
+        equation = derivative;
+        solution = answer;
+    }
+
+    /// <summary>
+    /// Integration: the constants and the exponents are calculated to make sure that the numbers are evenly dividable so that there are no fractions in our integral answers
+    /// </summary>
+    private void integration()
+    {
+        int a = UnityEngine.Random.Range(3, 5) * 2 - 1;
+        int b;
+        string integral = "Integral of" + " ";
+        string answer = "";
+        for (int i = a; a > 1; i--)
+        {
+            if (a > 1)
+            {
+                b = UnityEngine.Random.Range(1, a / 2) * 2;
+            }
+            else
+            {
+                b = UnityEngine.Random.Range(1, a * 5) * 2;
+            }
+            if (a <= 3)
+            {
+                integral += (b * a).ToString() + "X^" + (a - 1).ToString();
+                answer += (b).ToString() + "X^" + (a).ToString() + " " + "+" + " " + "C";
+                break;
+            }
+            else
+            {
+                integral += (b * a).ToString() + "X^" + (a - 1).ToString() + " " + "+" + " ";
+                answer += (b).ToString() + "X^" + (a).ToString() + " " + "+" + " ";
+            }
+            a = a / 2;
+        }
+        equation = integral;
+        solution = answer;
+    }
 
     private void FractionsMultiDiv()
     {
@@ -201,19 +279,19 @@ public class EquationGen
 
         if (oper == 0)
         {
-            a = UnityEngine.Random.Range(10, 100);
-            b = UnityEngine.Random.Range(10, 100);
+            a = UnityEngine.Random.Range(0, 100);
+            b = UnityEngine.Random.Range(0, 100);
 
             equation = a.ToString() + " * " + b.ToString();
             solution = (a * b).ToString();
         }
         else
         {
-            sol = UnityEngine.Random.Range(100, 1000);
+            sol = UnityEngine.Random.Range(0, 1000);
             do
             {
                 a = UnityEngine.Random.Range(0, sol);
-            } while (sol % a != 0 || a == 0);
+            } while (sol % a != 0);
 
             b = sol / a;
 
@@ -222,7 +300,7 @@ public class EquationGen
         }
     }
 
-    
+
     private void BasicMultiDiv()
     {
         int sol;
@@ -263,13 +341,14 @@ public class EquationGen
 
         int oper = UnityEngine.Random.Range(0, 1);
 
-        if(oper == 0)
+        if (oper == 0)
         {
+
             equation = a.ToString() + " + " + b.ToString();
         }
         else
         {
-            if(a > b)
+            if (a > b)
             {
                 equation = a.ToString() + " - " + b.ToString();
             }
@@ -282,7 +361,7 @@ public class EquationGen
 
     private void HundredsAddSub()
     {
-        int sol = UnityEngine.Random.Range(100, 999);
+        int sol = UnityEngine.Random.Range(0, 999);
         solution = sol.ToString();
 
         int a = sol - UnityEngine.Random.Range(0, sol);
@@ -312,7 +391,7 @@ public class EquationGen
 
     private void ThousandsAddSub()
     {
-        int sol = UnityEngine.Random.Range(1000, 9999);
+        int sol = UnityEngine.Random.Range(0, 9999);
         solution = sol.ToString();
 
         int a = sol - UnityEngine.Random.Range(0, sol);
