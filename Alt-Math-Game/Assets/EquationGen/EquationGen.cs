@@ -201,19 +201,19 @@ public class EquationGen
 
         if (oper == 0)
         {
-            a = UnityEngine.Random.Range(0, 100);
-            b = UnityEngine.Random.Range(0, 100);
+            a = UnityEngine.Random.Range(10, 100);
+            b = UnityEngine.Random.Range(10, 100);
 
             equation = a.ToString() + " * " + b.ToString();
             solution = (a * b).ToString();
         }
         else
         {
-            sol = UnityEngine.Random.Range(0, 1000);
+            sol = UnityEngine.Random.Range(100, 1000);
             do
             {
                 a = UnityEngine.Random.Range(0, sol);
-            } while (sol % a != 0);
+            } while (sol % a != 0 || a == 0);
 
             b = sol / a;
 
@@ -282,7 +282,7 @@ public class EquationGen
 
     private void HundredsAddSub()
     {
-        int sol = UnityEngine.Random.Range(0, 999);
+        int sol = UnityEngine.Random.Range(100, 999);
         solution = sol.ToString();
 
         int a = sol - UnityEngine.Random.Range(0, sol);
@@ -312,7 +312,7 @@ public class EquationGen
 
     private void ThousandsAddSub()
     {
-        int sol = UnityEngine.Random.Range(0, 9999);
+        int sol = UnityEngine.Random.Range(1000, 9999);
         solution = sol.ToString();
 
         int a = sol - UnityEngine.Random.Range(0, sol);
