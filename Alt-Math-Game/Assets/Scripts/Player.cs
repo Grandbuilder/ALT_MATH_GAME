@@ -42,7 +42,8 @@ public class Player : MonoBehaviour
     //sound for attack
     private AudioSource monster;
     AudioClip mstr;
-
+    public CanvasGroup myCG;
+    private bool flash = false;
     // Use this for initialization
     void Start()
     {
@@ -98,7 +99,7 @@ public class Player : MonoBehaviour
         //this the equation shown
         equationText.transform.GetComponent<Text>().text = "Equation: " + equations[activeEnemyIndex].equation;
         currentEnemy = enemies[0];
-
+        myCG = GameObject.Find("Flash").GetComponent<CanvasGroup>();
     }
 
     // Update is called once per frame
@@ -108,6 +109,17 @@ public class Player : MonoBehaviour
         updateActiveEnemy();
         //look towards target
         trackEnemy();
+
+        if (flash)
+        {
+
+            myCG.alpha = myCG.alpha - Time.deltaTime;
+            if (myCG.alpha <= 0)
+            {
+                myCG.alpha = 0;
+                flash = false;
+            }
+        }
     }
     /// <summary>
     /// Game over when player reaches 0 hp or end of enemies
@@ -122,6 +134,8 @@ public class Player : MonoBehaviour
             //if enemy reached player or player gave wrong answer, lose 1 hp and check if dead.
             if (curEnemy.reachedPlayer || wrongAnswer)
             {
+                flash = true;
+                myCG.alpha = 1;
                 monster.PlayOneShot(mstr);
                 wrongAnswer = false;
                 health--;

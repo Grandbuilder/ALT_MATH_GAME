@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
     /// <summary>
     /// ////////////////////Need dead boolean that equals true based off of equation and input.
     /// </summary>
-    public float moveSpeed = 0.01f;
+    public float moveSpeed = 0.1f;
     private Vector3 playerLoc;
     [HideInInspector]
     public bool reachedPlayer;
@@ -25,31 +25,19 @@ public class Enemy : MonoBehaviour
         //looking at player
         transform.rotation = Quaternion.Slerp(transform.rotation,
     Quaternion.LookRotation(playerLoc - transform.position),
-    .2f * Time.deltaTime);
+    1.1f * Time.deltaTime);
 
         //moving to player
-        Vector3 newVec = this.transform.position;
+        
+        Vector3 newVec = transform.position + transform.forward * moveSpeed * Time.deltaTime;
+        newVec.y = transform.position.y;
+        /*
         newVec[0] = this.transform.position.x;
         newVec[1] = this.transform.position.y;
-        newVec[2] = this.transform.position.z;
+        newVec[2] = this.transform.position.z;*/
         //move towards player
-        if (newVec[0] > playerLoc.x)
-        {
-            newVec[0] -= moveSpeed;
-        }
-        else if (newVec[0] < playerLoc.x)
-        {
-            newVec[0] += moveSpeed;
-        }
-        if (newVec[2] > playerLoc.z)
-        {
-            newVec[2] -= moveSpeed;
-        }
-        else if (newVec[2] < playerLoc.z)
-        {
-            newVec[2] += moveSpeed;
-        }
-        this.transform.position = newVec;
+        //transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        transform.position = newVec;
 
         if ((transform.position.x + 2.3 > playerLoc.x && transform.position.x - 2.3 < playerLoc.x)
             && (transform.position.z + 2.3 > playerLoc.z && transform.position.z - 2.3 < playerLoc.z))

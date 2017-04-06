@@ -55,10 +55,10 @@ public class EquationGen
         {
             BasicAddSub();
         }
-        else if (genSeed == 8)
+        /*else if (genSeed == 8)
         {
             HundredsAddSub();
-        }
+        }*/
         else if (genSeed == 3)
         {
             ThousandsAddSub();
