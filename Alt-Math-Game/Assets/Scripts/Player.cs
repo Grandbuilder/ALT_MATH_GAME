@@ -45,6 +45,7 @@ public class Player : MonoBehaviour
     public CanvasGroup myCG;
     private bool flash = false;
     // Use this for initialization
+    private bool moving = false;
     void Start()
     {
         //initializing the game music
@@ -153,14 +154,37 @@ public class Player : MonoBehaviour
                 Debug.Log("Active Enemy Index:" + activeEnemyIndex);
                 if (activeEnemyIndex == 20)
                 {
+                    if (transform.position != levels[1].transform.position)
+                    {
+                        moving = true;
+                        currentEnemy = enemies[activeEnemyIndex];
+                        activeEnemyIndex--;//keep active index in check
+                        Vector3 newVec = transform.position + transform.forward * 7f * Time.deltaTime;
+                        newVec.y = transform.position.y;
+                        transform.position = newVec;
+                        if (Vector3.Distance(transform.position, levels[1].transform.position) <= 7)
+                        {
+                            transform.position = levels[1].transform.position;
+                        }
+                    }
+                    else
+                    {
+                        moving = false;
+                        enemies[activeEnemyIndex].SetActive(true);
+                        currentEnemy = enemies[activeEnemyIndex];
+                    }
                     Debug.Log("");
                     Debug.Log("Suppose to move to level 2.");
                     //move player to level 2
-                    transform.position = levels[1].transform.position;
+                    //transform.position = levels[1].transform.position;
+                }
+                else
+                {
+                    enemies[activeEnemyIndex].SetActive(true);
+                    currentEnemy = enemies[activeEnemyIndex];
                 }
                 //current enemy is next enemy in array of enemies, activate it
-                enemies[activeEnemyIndex].SetActive(true);
-                currentEnemy = enemies[activeEnemyIndex];
+                
             }
             //if all enemies have been encountered.
             else
@@ -168,7 +192,14 @@ public class Player : MonoBehaviour
                 //victory
                 endGame();
             }
-            equationText.transform.GetComponent<Text>().text = "Equation: " + equations[activeEnemyIndex].equation;
+            if(moving)
+            {
+                equationText.transform.GetComponent<Text>().text = "Entering Level: " + ((activeEnemyIndex+1)/20);
+            }
+            else
+            {
+                equationText.transform.GetComponent<Text>().text = "Equation: " + equations[activeEnemyIndex].equation;
+            }          
         }
     }
     /// <summary>
