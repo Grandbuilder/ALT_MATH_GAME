@@ -25,7 +25,7 @@ public class Player : MonoBehaviour
     private float camHeight;
     private float camWidth;
     private Rect inputBox;
-
+    private bool playDeath;
     private Rect scoreBox;
     private int score = 0;
 
@@ -110,7 +110,14 @@ public class Player : MonoBehaviour
         updateActiveEnemy();
         //look towards target
         trackEnemy();
-
+        if(playDeath)
+        {
+            currentEnemy.gameObject.transform.GetChild(0).gameObject.SetActive(true);
+            currentEnemy.gameObject.transform.GetChild(1).gameObject.SetActive(false);
+            currentEnemy.gameObject.transform.GetChild(2).gameObject.SetActive(false);
+            currentEnemy.GetComponent<Enemy>().dead = true;
+            playDeath = false;
+        }
         if (flash)
         {
 
@@ -164,6 +171,8 @@ public class Player : MonoBehaviour
                         transform.position = newVec;
                         if (Vector3.Distance(transform.position, levels[1].transform.position) <= 7)
                         {
+                            //reset player health each level
+                            health = 3;
                             transform.position = levels[1].transform.position;
                         }
                     }
@@ -173,9 +182,6 @@ public class Player : MonoBehaviour
                         enemies[activeEnemyIndex].SetActive(true);
                         currentEnemy = enemies[activeEnemyIndex];
                     }
-                    Debug.Log("");
-                    Debug.Log("Suppose to move to level 2.");
-                    //move player to level 2
                     //transform.position = levels[1].transform.position;
                 }
                 else
@@ -242,19 +248,27 @@ public class Player : MonoBehaviour
         /// </summary>
         if (Event.current.isKey && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter) && !enterStillDown)
         {
-            enterStillDown = true;
-            currentEnemy.SetActive(false);
-            //equation generator input comparison
-            if (stringToEdit != equations[activeEnemyIndex].solution)
+            if(!currentEnemy.GetComponent<Enemy>().dead)
             {
-                wrongAnswer = true;
+                enterStillDown = true;
+                //equation generator input comparison
+                if (stringToEdit != equations[activeEnemyIndex].solution)
+                {
+                    currentEnemy.SetActive(false);
+                    wrongAnswer = true;
+                }
+                else
+                {
+                    playDeath = true;
+                    write.PlayOneShot(wrt);
+                    score += 1000;
+                }
+                stringToEdit = "";
             }
             else
             {
-                write.PlayOneShot(wrt);
-                score += 1000;
+                currentEnemy.SetActive(false);
             }
-            stringToEdit = "";
         }
         if (Event.current.keyCode != KeyCode.Return && Event.current.keyCode != KeyCode.KeypadEnter)
         {
