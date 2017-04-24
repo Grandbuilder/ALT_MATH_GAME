@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     public int lookSpeed = 5;   //rotation speed of player
     public int health = 3;          //player health. 1 damage taken per failed encounter
     public GameObject equationText;
+    public float timer;
+    static public List<float> timeTakenPerEnemy = new List<float>();
     private GameObject currentEnemy;    //currently active enemy
     private int numEnemies;     //number of enemies on this level
     private int numLevels;     //number of levels in world
@@ -27,7 +29,8 @@ public class Player : MonoBehaviour
     private Rect inputBox;
     private bool playDeath;
     private Rect scoreBox;
-    private int score = 0;
+    private Rect timerBox;
+    static public int score = 0;
 
     private Rect healthBox;
 
@@ -72,6 +75,8 @@ public class Player : MonoBehaviour
 
         scoreBox = new Rect(0, camHeight - 25, 100, 100);
 
+        timerBox = new Rect(0, 0, 100, 100);
+
         levels = GameObject.FindGameObjectsWithTag("Level").OrderBy(go => go.name).ToArray(); ;
         numLevels = levels.Length;
         activeEnemyIndex = 0;
@@ -110,8 +115,10 @@ public class Player : MonoBehaviour
         updateActiveEnemy();
         //look towards target
         trackEnemy();
-        if(playDeath)
+        if (playDeath)
         {
+            timeTakenPerEnemy.Add(timer);
+            timer = 0;
             currentEnemy.gameObject.transform.GetChild(0).gameObject.SetActive(true);
             currentEnemy.gameObject.transform.GetChild(1).gameObject.SetActive(false);
             currentEnemy.gameObject.transform.GetChild(2).gameObject.SetActive(false);
@@ -143,13 +150,14 @@ public class Player : MonoBehaviour
             if (curEnemy.reachedPlayer || wrongAnswer)
             {
                 flash = true;
+                timer = 0;
                 myCG.alpha = 1;
                 monster.PlayOneShot(mstr);
                 wrongAnswer = false;
                 health--;
                 if (health <= 0)
                 {
-                    GameManager.gameOverScene();
+                    GameManager.gameOverScene(this);
                 }
             }
             //increment enemies index
@@ -190,7 +198,7 @@ public class Player : MonoBehaviour
                     currentEnemy = enemies[activeEnemyIndex];
                 }
                 //current enemy is next enemy in array of enemies, activate it
-                
+
             }
             //if all enemies have been encountered.
             else
@@ -198,14 +206,19 @@ public class Player : MonoBehaviour
                 //victory
                 endGame();
             }
-            if(moving)
+            if (moving)
             {
-                equationText.transform.GetComponent<Text>().text = "Entering Level: " + ((activeEnemyIndex+1)/20);
+                equationText.transform.GetComponent<Text>().text = "Entering Level: " + ((activeEnemyIndex + 1) / 20);
+                timer = 0;
             }
             else
             {
                 equationText.transform.GetComponent<Text>().text = "Equation: " + equations[activeEnemyIndex].equation;
-            }          
+            }
+        }
+        if(!playDeath && !currentEnemy.transform.GetChild(0).GetComponent<ParticleSystem>().IsAlive())
+        {
+            timer += Time.deltaTime;
         }
     }
     /// <summary>
@@ -234,6 +247,7 @@ public class Player : MonoBehaviour
 
         GUI.Label(scoreBox, "Score: " + score.ToString(), style);
         GUI.Label(healthBox, "Health: " + health.ToString(), style);
+        GUI.Label(timerBox, timer.ToString(), style);
 
 
         GUI.SetNextControlName("mytextfield");
@@ -248,7 +262,7 @@ public class Player : MonoBehaviour
         /// </summary>
         if (Event.current.isKey && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter) && !enterStillDown)
         {
-            if(!currentEnemy.GetComponent<Enemy>().dead)
+            if (!currentEnemy.GetComponent<Enemy>().dead)
             {
                 enterStillDown = true;
                 //equation generator input comparison

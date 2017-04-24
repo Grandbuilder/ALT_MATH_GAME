@@ -25,6 +25,7 @@ public class Enemy : MonoBehaviour
     {
         if(!dead)
         {
+            
             playerLoc = Camera.main.transform.position;
             //looking at player
             transform.rotation = Quaternion.Slerp(transform.rotation,
