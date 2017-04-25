@@ -53,40 +53,56 @@ public class EquationGen
         }
         if (genSeed == 1)
         {
-            BasicAddSub();
-        }
-        /*else if (genSeed == 8)
-        {
-            HundredsAddSub();
-        }*/
-        else if (genSeed == 3)
-        {
-            ThousandsAddSub();
+            SingleAdd();
         }
         else if (genSeed == 2)
         {
-            BasicMultiDiv();
+            SingleSub();
+        }
+        else if (genSeed == 3)
+        {
+            SimpleMult();
+        }
+        else if (genSeed == 4)
+        {
+            DoubleAdd();
         }
         else if (genSeed == 5)
         {
+            DoubleSub();
+        }
+        /*
+        if (genSeed == 1)
+        {
+            BasicAddSub();
+        }
+        else if (genSeed == 2)
+        {
+            ThousandsAddSub();
+        }
+        else if (genSeed == 3)
+        {
+            BasicMultiDiv();
+        }
+        else if (genSeed == 4)
+        {
+            derivative();
+        }
+        else if (genSeed == 5)
+        {
+            integration();
+        }
+        /*else if (genSeed == 3)
+        {
             HundredsMultiDiv();
         }
-
-        else if (genSeed == 6)
+        else if (genSeed == 4)
         {
             FractionsAddSub();
         }
         else if (genSeed == 7)
         {
             FractionsMultiDiv();
-        }
-        else if (genSeed == 8)
-        {
-            integration();
-        }
-        else if (genSeed == 9)
-        {
-            derivative();
         }
         //else if(genSeed == 8)
         //{
@@ -95,7 +111,7 @@ public class EquationGen
         //else if(genSeed == 9)
         //{
         //    DecimalMultiDiv();
-        //}
+        //}*/
         else
         {
             throw new NotImplementedException();
@@ -136,7 +152,42 @@ public class EquationGen
         //}
 
     }
+    private void SingleAdd()
+    {
+        int sol = UnityEngine.Random.Range(0, 10);
+        solution = sol.ToString();
 
+        int a = sol - UnityEngine.Random.Range(0, sol);
+        int b = sol - a;
+
+        equation = a.ToString() + " + " + b.ToString();
+    }
+    private void SingleSub()
+    {
+        int a = UnityEngine.Random.Range(0, 10);
+        int b = UnityEngine.Random.Range(0, 10);
+        int sol = a - b;
+        solution = sol.ToString();
+        equation = a.ToString() + " - " + b.ToString();
+    }
+    private void DoubleAdd()
+    {
+        int sol = UnityEngine.Random.Range(0, 100);
+        solution = sol.ToString();
+
+        int a = sol - UnityEngine.Random.Range(0, sol);
+        int b = sol - a;
+
+        equation = a.ToString() + " + " + b.ToString();
+    }
+    private void DoubleSub()
+    {
+        int a = UnityEngine.Random.Range(0, 100);
+        int b = UnityEngine.Random.Range(0, 100);
+        int sol = a - b;
+        solution = sol.ToString();
+        equation = a.ToString() + " - " + b.ToString();
+    }
     /// <summary>
     /// the derivative function is very similar to the integral function but their is no check for fraction creation because we multiply rather than divide.
     /// </summary>
@@ -358,7 +409,21 @@ public class EquationGen
             }
         }
     }
+    private void SimpleMult()
+    {
+        int a;
+        int b;
+        int oper = UnityEngine.Random.Range(0, 1);
 
+        if (oper == 0)
+        {
+            a = UnityEngine.Random.Range(0, 10);
+            b = UnityEngine.Random.Range(0, 10);
+
+            equation = a.ToString() + " * " + b.ToString();
+            solution = (a * b).ToString();
+        }
+    }
     private void HundredsAddSub()
     {
         int sol = UnityEngine.Random.Range(0, 999);
@@ -391,31 +456,31 @@ public class EquationGen
 
     private void ThousandsAddSub()
     {
-        int sol = UnityEngine.Random.Range(0, 9999);
+        int sol = UnityEngine.Random.Range(0, 100);
         solution = sol.ToString();
 
         int a = sol - UnityEngine.Random.Range(0, sol);
         int b = sol - a;
 
-        int oper = UnityEngine.Random.Range(0, 1);
+        //int oper = UnityEngine.Random.Range(0, 1);
 
-        if (oper == 0)
+        /*if (oper == 0)
         {
             equation = a.ToString() + " + " + b.ToString();
             solution = (a + b).ToString();
+        }*/
+        //else
+        //{
+        if (a > b)
+        {
+            equation = a.ToString() + " - " + b.ToString();
+            solution = (a - b).ToString();
         }
         else
         {
-            if (a > b)
-            {
-                equation = a.ToString() + " - " + b.ToString();
-                solution = (a - b).ToString();
-            }
-            else
-            {
-                equation = b.ToString() + " - " + a.ToString();
-                solution = (b - a).ToString();
-            }
+            equation = b.ToString() + " - " + a.ToString();
+            solution = (b - a).ToString();
         }
+        //}
     }
 }

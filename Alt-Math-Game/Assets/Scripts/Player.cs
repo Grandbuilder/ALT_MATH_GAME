@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     //Polished victory and loss. Currently exits a built game immediately. -after prototype
 
     public int lookSpeed = 5;   //rotation speed of player
-    public int health = 3;          //player health. 1 damage taken per failed encounter
+    public int health = 5;          //player health. 1 damage taken per failed encounter
     public GameObject equationText;
     public float timer;
     static public List<float> timeTakenPerEnemy = new List<float>();
@@ -138,7 +138,7 @@ public class Player : MonoBehaviour
     }
     /// <summary>
     /// Game over when player reaches 0 hp or end of enemies
-    /// Otherwise, move to next enemy if current enemy died
+    /// Otherwise, activate next enemy if current enemy died, or move to next level.
     /// </summary>
     void updateActiveEnemy()
     {
@@ -167,9 +167,9 @@ public class Player : MonoBehaviour
             if (activeEnemyIndex < numEnemies)
             {
                 Debug.Log("Active Enemy Index:" + activeEnemyIndex);
-                if (activeEnemyIndex == 20)
+                if (activeEnemyIndex == 20 || activeEnemyIndex == 40 || activeEnemyIndex == 60 || activeEnemyIndex == 80)
                 {
-                    if (transform.position != levels[1].transform.position)
+                    if (transform.position != levels[(activeEnemyIndex + 1) / 20].transform.position)
                     {
                         moving = true;
                         currentEnemy = enemies[activeEnemyIndex];
@@ -177,11 +177,11 @@ public class Player : MonoBehaviour
                         Vector3 newVec = transform.position + transform.forward * 7f * Time.deltaTime;
                         newVec.y = transform.position.y;
                         transform.position = newVec;
-                        if (Vector3.Distance(transform.position, levels[1].transform.position) <= 7)
+                        if (Vector3.Distance(transform.position, currentEnemy.transform.position) <= 20)
                         {
                             //reset player health each level
-                            health = 3;
-                            transform.position = levels[1].transform.position;
+                            health = 5;
+                            transform.position = levels[(activeEnemyIndex + 1) / 20].transform.position;
                         }
                     }
                     else
@@ -208,7 +208,7 @@ public class Player : MonoBehaviour
             }
             if (moving)
             {
-                equationText.transform.GetComponent<Text>().text = "Entering Level: " + ((activeEnemyIndex + 1) / 20);
+                equationText.transform.GetComponent<Text>().text = "Entering Level: " + ((activeEnemyIndex + 1) / 20+1);
                 timer = 0;
             }
             else
@@ -243,7 +243,10 @@ public class Player : MonoBehaviour
     {
 
         var style = new GUIStyle();
-        style.fontSize = 20;
+        style.fontSize = 35;
+        style.normal.textColor = Color.white;
+        style.fontStyle = FontStyle.Italic;
+
 
         GUI.Label(scoreBox, "Score: " + score.ToString(), style);
         GUI.Label(healthBox, "Health: " + health.ToString(), style);
@@ -262,26 +265,29 @@ public class Player : MonoBehaviour
         /// </summary>
         if (Event.current.isKey && (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter) && !enterStillDown)
         {
-            if (!currentEnemy.GetComponent<Enemy>().dead)
+            if(!moving)
             {
-                enterStillDown = true;
-                //equation generator input comparison
-                if (stringToEdit != equations[activeEnemyIndex].solution)
+                if (!currentEnemy.GetComponent<Enemy>().dead)
                 {
-                    currentEnemy.SetActive(false);
-                    wrongAnswer = true;
+                    enterStillDown = true;
+                    //equation generator input comparison
+                    if (stringToEdit != equations[activeEnemyIndex].solution)
+                    {
+                        currentEnemy.SetActive(false);
+                        wrongAnswer = true;
+                    }
+                    else
+                    {
+                        playDeath = true;
+                        write.PlayOneShot(wrt);
+                        score += 1000;
+                    }
+                    stringToEdit = "";
                 }
                 else
                 {
-                    playDeath = true;
-                    write.PlayOneShot(wrt);
-                    score += 1000;
+                    currentEnemy.SetActive(false);
                 }
-                stringToEdit = "";
-            }
-            else
-            {
-                currentEnemy.SetActive(false);
             }
         }
         if (Event.current.keyCode != KeyCode.Return && Event.current.keyCode != KeyCode.KeypadEnter)
